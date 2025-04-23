@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    build: ./postgres
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: alunosdb
+    ports:
+      - "5432:5432"
+    networks:
+      - dev-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mongo:
+    build: ./mongo
+    container_name: mongo-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    ports:
+      - "27017:27017"
+    networks:
+      - dev-network
+    volumes:
+      - mongodata:/data/db
+
+  node:
+    build: ./node
+    container_name: node-app
+    working_dir: /app
+    volumes:
+      - ./node:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - mongo
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+  mongodata:
